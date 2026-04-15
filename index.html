@@ -4,27 +4,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>X3 | R3X_PROTOCOL</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CSS INTERNAL --- */
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .terminal {
+            width: 90%;
+            height: 80%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: #00ff41;
+            color: #000;
+            padding: 5px 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: blink 1s infinite;
+        }
+
+        .terminal-body {
+            padding: 15px;
+            overflow-y: auto;
+            flex-grow: 1;
+            font-size: 14px;
+        }
+
+        .prompt { color: #00ff41; margin-right: 8px; }
+        .command-line { margin: 10px 0; color: #fff; }
+        
+        .input-area { display: flex; align-items: center; }
+        input {
+            background: transparent;
+            border: none;
+            color: #00ff41;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Prank UI */
+        #prank-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: red; color: white; z-index: 10000;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; font-family: sans-serif;
+        }
+    </style>
 </head>
 <body>
+
     <div class="overlay"></div>
-    <div class="terminal">
+
+    <div class="terminal" id="main-terminal">
         <header class="terminal-header">
-            <span class="status-dot"></span>
-            <span class="title">R3X@SYSTEM_TERMINAL: ~/home</span>
+            <div class="status-dot"></div>
+            <span>R3X@X3_SYSTEM_v2.1: ~/home</span>
         </header>
         <div class="terminal-body" id="console">
-            <p class="line">[OK] INITIALIZING X3_KERNEL_V2.1...</p>
-            <p class="line">[OK] BYPASSING FIREWALL... 100%</p>
-            <p class="line">[WARNING] R3X LEVEL ACCESS DETECTED.</p>
-            <p class="command-line">Welcome, R3X. Siap ngebrak-abrik apa hari ini?</p>
+            <p>[OK] INITIALIZING X3_KERNEL_V2.1...</p>
+            <p>[OK] BYPASSING SECURITY LAYERS... 100%</p>
+            <p style="color: yellow;">[WARNING] R3X LEVEL ACCESS DETECTED.</p>
+            <p class="command-line">Welcome back, R3X. Ketik 'help' buat list perintah.</p>
             <div id="output"></div>
             <div class="input-area">
                 <span class="prompt">R3X@X3:~$</span>
-                <input type="text" id="user-input" autofocus>
+                <input type="text" id="user-input" autofocus autocomplete="off">
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <div id="prank-screen">
+        <h1 style="font-size: 3rem;">SYSTEM CRITICAL!</h1>
+        <p>MALWARE DETECTED: TROJAN.R3X_EXEC</p>
+        <p>DOWNLOADING ALL PRIVATE DATA & MEDIA...</p>
+        <div style="width: 80%; border: 2px solid white; height: 30px; margin-top: 20px;">
+            <div id="bar" style="width: 0%; height: 100%; background: white;"></div>
+        </div>
+        <p id="percent" style="margin-top: 10px;">0%</p>
+        <p style="margin-top: 50px; font-size: 12px; opacity: 0.7;">ENCRYPTING FILES... BYE BYE.</p>
+    </div>
+
+    <script>
+        /* --- JAVASCRIPT INTERNAL --- */
+        const input = document.getElementById('user-input');
+        const output = document.getElementById('output');
+        const prankScreen = document.getElementById('prank-screen');
+
+        // Cek link prank otomatis (?target=true)
+        if (window.location.search.includes('target=true')) {
+            startPrank();
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim().toLowerCase();
+                printLine(`<span class="prompt">R3X@X3:~$</span> ${cmd}`);
+
+                switch(cmd) {
+                    case 'help':
+                        printLine("Commands: <br>- <b>store</b>: Akses Toko Digital R3X<br>- <b>inject</b>: Start Gaming Panel<br>- <b>prank</b>: Aktivasi Trojan Simulator<br>- <b>clear</b>: Bersihkan Layar");
+                        break;
+                    case 'store':
+                        printLine("Mengarahkan ke Store...");
+                        setTimeout(() => window.open('https://instagram.com/zakialfian221', '_blank'), 1000);
+                        break;
+                    case 'inject':
+                        printLine("<span style='color:cyan'>[+] Connecting to Game Server...</span>");
+                        printLine("<span style='color:cyan'>[+] Injection Success. Script Active.</span>");
+                        break;
+                    case 'prank':
+                        printLine("<span style='color:red'>[!] Trojan.EXE Initiated...</span>");
+                        setTimeout(startPrank, 2000);
+                        break;
+                    case 'clear':
+                        output.innerHTML = '';
+                        break;
+                    case '':
+                        break;
+                    default:
+                        printLine(`'${cmd}' salah ketik? Cek 'help', R3X.`);
+                }
+                input.value = '';
+                document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+            }
+        });
+
+        function printLine(text) {
+            const p = document.createElement('p');
+            p.innerHTML = text;
+            output.appendChild(p);
+        }
+
+        function startPrank() {
+            document.getElementById('main-terminal').style.display = 'none';
+            prankScreen.style.display = 'flex';
+            
+            if (navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+
+            let width = 0;
+            const bar = document.getElementById('bar');
+            const pct = document.getElementById('percent');
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    pct.innerText = "UPLOAD COMPLETE. DATABASE WIPED.";
+                } else {
+                    width++;
+                    bar.style.width = width + '%';
+                    pct.innerText = width + '%';
+                }
+            }, 60);
+        }
+    </script>
 </body>
-</html>
+    </html>
